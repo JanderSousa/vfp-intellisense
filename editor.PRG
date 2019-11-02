@@ -16,7 +16,7 @@ Define Class Editor As Custom
 		Local nOK, cErr
 		
 		Dimension ArrEnv[25]
-
+		
 		cErr = On("Error")
 		On Error nOK = 0
 		nOK = _EdGetEnv(nWinHandle, @ArrEnv)
@@ -27,7 +27,7 @@ Define Class Editor As Custom
 			On Error &cErr
 		EndIf
 		
-		If nOK == 0
+		If nOK == 0 or ArrEnv[25] = 0
 			Return .Null.
 		EndIf
 		

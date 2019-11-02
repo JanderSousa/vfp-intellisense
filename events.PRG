@@ -38,7 +38,7 @@ Define Class Events As Custom
 	Endproc
 
 	Procedure Eventhandler(HWnd, Msg, wParam, Lparam)
-
+		
 		Sys(2030, 0)
 		Set Console Off
 
