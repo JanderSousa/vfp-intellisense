@@ -111,7 +111,7 @@ Define Class Events As Custom
 
 	Procedure SetEnvironment(nMode)
 
-		If nMode =  1
+		If nMode = 1
 			This.Environment[1] = Set("TALK")
 			This.Environment[2] = Set("NOTIFY",2)
 			This.Environment[3] = Set("ESCAPE")
@@ -257,7 +257,11 @@ Define Class Events As Custom
 
 			This.KEY_CONTROL = Bittest(___GetKeyState(.Control), 7)
 			This.KEY_SHIFT = Bittest(___GetKeyState(.Shift), 7)
-
+			
+			If !This.KEY_CONTROL And wParam = .Space
+				Return This.HideSuggestVisible()
+			EndIf 
+			
 			If Inlist(wParam, .OEM_3, .OEM_6, .NINE)
 
 				oIntellisense = This.IntellisenseCollection.TryToStart()
@@ -349,7 +353,11 @@ Define Class Events As Custom
 
 			If This.KEY_CONTROL And !Bittest(___GetKeyState(.Control), 7)
 				Return
-			Endif
+			EndIf
+			
+			If !This.KEY_CONTROL And wParam = .Space
+				Return This.HideSuggestVisible()
+			EndIf 			
 
 			If This.KEY_CONTROL And nLastKey = 5
 				Return

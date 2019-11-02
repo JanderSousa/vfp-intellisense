@@ -4,7 +4,7 @@ Define Class Editor As Custom
 	MaxLine = 130 * 1000 && Maximum rows to be used from editor
 	Boundaries = "\,;:)(.[]'=<>+-*/!^%|&#{}?@$" + ["] + Chr(13) + Chr(10) + Chr(32) + Chr(9)
 	InvalidCharacters = Chr(1)+Chr(2)+Chr(3)+Chr(4)+Chr(5)+Chr(6)+Chr(7)+Chr(8)	
-	
+
 	Procedure Init
 		If !"FOXTOOLS.FLL" $ Upper(Set("Library"))
 			Set Library To (Home()+"FoxTools.Fll") Additive
@@ -16,7 +16,7 @@ Define Class Editor As Custom
 		Local nOK, cErr
 		
 		Dimension ArrEnv[25]
-		
+
 		cErr = On("Error")
 		On Error nOK = 0
 		nOK = _EdGetEnv(nWinHandle, @ArrEnv)
