@@ -4,8 +4,14 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 	MaxSuggestions = 1000
 	FrmSuggestion = .Null.
 	CurrentWord = ""
+	Binding = .F.
 	
 	AddPublicVariables = .T.
+	AddDefaultCommands = .T.
+	AddDefaultFuctions = .T.
+	AddDefaultBaseClasses = .T.
+	AddDefaultDBCEvents = .T.
+	
 	AutoClosingSingleQuotes = .T.
 	AutoClosingDoubleQuotes = .T.
 	AutoClosingBraces = .T.  
@@ -28,8 +34,8 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 		Declare Integer GetCaretPos in Win32API String@
 		Declare Integer GetParent in Win32API Integer
 		Declare Integer GetWindowRect in Win32API Long, String@
-		Declare Integer FindWindowEx in Win32API Integer, Integer, String, String		
-		
+		Declare Integer FindWindowEx in Win32API Integer, Integer, String, String	
+			
 	EndProc 
 	
 	Procedure RemoveCurrentChar
@@ -190,7 +196,23 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 		
 		If This.AddPublicVariables
 			This.GetPublicVariables()
-		EndIf 	
+		EndIf 	 
+		
+		If This.AddDefaultCommands
+			This.GetDefaultCommands()
+		EndIf 
+		
+		If This.AddDefaultFuctions
+			this.GetDefaultFuctions()
+		EndIf 
+				
+		If This.AddDefaultDBCEvents
+			This.GetDefaultDBCEvents()
+		EndIf 
+		
+		If This.AddDefaultBaseClasses
+			This.GetDefaultBaseClasses()
+		EndIf
 				
 	EndProc 
 	
@@ -272,6 +294,38 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 				
 	EndProc	
 	
+	Procedure GetDefaultCommands
+		Local ArrCommands[1], i
+		
+		For i=1 to ALanguage(ArrCommands, 1)
+			This.AddWord(ArrCommands[i])
+		Next
+	EndProc 
+	
+	Procedure GetDefaultFuctions
+		Local ArrFunctions[1], i
+		
+		For i=1 to ALanguage(ArrFunctions, 2)
+			This.AddWord(ArrFunctions[i, 1])
+		Next	
+	EndProc 
+	
+	Procedure GetDefaultBaseClasses
+		Local ArrBaseClasses[1], i
+		
+		For i=1 to ALanguage(ArrBaseClasses, 3)
+			This.AddWord(ArrBaseClasses[i])
+		Next	
+	EndProc 
+	
+	Procedure GetDefaultDBCEvents
+		Local ArrDBCEvents[1], i
+		
+		For i=1 to ALanguage(ArrDBCEvents, 4)
+			This.AddWord(ArrDBCEvents[i])
+		Next	
+	EndProc 
+	
 	Procedure AddCurretWord
 		Lparameters Key
 		Local CurrentWord
@@ -282,9 +336,7 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 			Return 
 		EndIf 
 		
-		If !Seek(Upper(Padr(CurrentWord, 40)), "crsCache", "word")
-			Insert into crsCache values (CurrentWord, Upper(CurrentWord), "")			
-		EndIf 
+		This.AddWord(CurrentWord)
 	EndProc 
 	
 	Procedure Destroy
