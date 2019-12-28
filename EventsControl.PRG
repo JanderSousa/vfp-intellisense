@@ -13,6 +13,8 @@ Set Procedure To "EventsControl.prg" Additive
 
 Define Class EventsControl As Custom
 	
+	Enabled = .T.
+	KeyLabelNameToReStart = "CTRL+R"
 	HasDebugger = .F.
 	SuggestionsCollection = .Null.
 	KEY_CONTROL = .F.
@@ -41,6 +43,8 @@ Define Class EventsControl As Custom
 			integer wParam, Integer Lparam
 
 		This.OldProc = GetWindowLong(_Screen.HWnd, GWL_WNDPROC)
+		
+		On Key Label (This.KeyLabelNameToReStart) _screen.vfp_intellisense.SetEnable()
 
 	Endproc
 
@@ -73,10 +77,19 @@ Define Class EventsControl As Custom
 	 
 	Procedure Eventhandler
 		Lparameters HWnd, Msg, wParam, Lparam
-
+		
+		If !This.Enabled
+			CallWindowProc(This.OldProc, HWnd, Msg, wParam, Lparam)
+			Return 
+		EndIf 
+		
 		If InList(wParam, 69) and Bittest(GetKeyState(VK_CONTROL), 7)
-			MessageBox("Intellisense will be shut down due to conflict with CTRL + S and VFP when an error occurs in execution.")
-			Do UninstallIntellisense
+			MessageBox("Intellisense will be shut down due to conflict with CTRL + S and VFP when an error occurs in execution."+;
+			 			Chr(13) + Chr(10) + "Press " + This.KeyLabelNameToReStart  + " to enable Intellisense.")
+
+			This.HideSuggestVisible()
+			This.BindOrUnbind(.T.)
+			Return 
 		EndIf
 			
 		Set Console Off
@@ -369,7 +382,12 @@ Define Class EventsControl As Custom
 
 		Clear Dlls "xxfcpWinAPI_GetActiveWindow","xxfcpWinAPI_GetWindow","xxfcpWinAPI_GetWindowText"
 
-	Endproc
+	EndProc
+	
+	Procedure SetEnable
+		This.BindOrUnbind()
+		This.Enabled = .T.
+	EndProc 
 
 	Protected Procedure ReStartIntelliSense
 		Lparameters HWnd, Msg, wParam, Lparam
@@ -379,6 +397,10 @@ Define Class EventsControl As Custom
 
 		Sys(2030, 1)
 		This.HasDebugger = .F.
-	Endproc
+	EndProc
+	
+	Procedure Destroy
+		On Key label (This.KeyLabelNameToReStart) 
+	EndProc 
 
 Enddefine
