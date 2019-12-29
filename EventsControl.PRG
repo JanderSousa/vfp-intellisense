@@ -72,6 +72,7 @@ Define Class EventsControl As Custom
 		FrmSuggest = This.GetFrmSuggestVisible()
 		If !Isnull(FrmSuggest)
 			FrmSuggest.Visible = .F.
+			FrmSuggest.Suggest.FrmTooltip.Visible = .F.
 		Endif	
 	EndProc  
 	 
@@ -92,7 +93,7 @@ Define Class EventsControl As Custom
 			Return 
 		EndIf
 			
-		Set Console Off
+		*Set Console Off
 		Sys(2030, 0) 
 
 		This.ChkDebugger()
@@ -138,6 +139,9 @@ Define Class EventsControl As Custom
 		For i=1 To This.SuggestionsCollection.Count
 			Suggest = This.SuggestionsCollection.Item[i]
 			Suggest.FrmSuggestion.Visible = Suggest.FrmSuggestion.HWnd = HWnd
+			If Suggest.FrmTooltip.Visible
+				Suggest.FrmTooltip.Visible = Suggest.FrmSuggestion.Visible
+			EndIf 
 		Next
 	Endproc
 
@@ -257,7 +261,7 @@ Define Class EventsControl As Custom
 	Procedure GetKeyUp
 		Lparameters HWnd, Msg, wParam, Lparam
 		
-		Local WHandle, Suggest, Source, FrmSuggest, ;
+		Local WHandle, Suggest, EditorSource, FrmSuggest, ;
 			CurrentTextLine, CurrentWord, ObjName, CharPos, Char    
 		
 		_LastKey = Lastkey()
@@ -286,9 +290,9 @@ Define Class EventsControl As Custom
 					
 				WHandle = This.GetCurrentWindow()
 
-	 			Source = This.GetEditSource(WHandle)
-
-				If Inlist(Source, 1, 2, 10)
+	 			EditorSource = This.GetEditSource(WHandle)
+				
+				If Inlist(EditorSource, 1, 2, 10)
 					Suggest = This.SuggestionsCollection.GetOrAddSuggest(WHandle)
   
 			 		If (!This.KEY_CONTROL And Chr(_LastKey) $ This.Boundaries)

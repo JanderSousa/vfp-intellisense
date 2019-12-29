@@ -16,5 +16,5 @@ Define Class SuggestionsCollection As Collection
 		Return This.Item[Index]
 
 	EndProc
-	
+		
 Enddefine

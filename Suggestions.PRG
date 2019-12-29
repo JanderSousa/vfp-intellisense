@@ -1,16 +1,20 @@
 Define Class Suggestions As EditorModel of "EditorModel.prg"
 	
-	MaxLine = 130 * 1000
-	MaxSuggestions = 1000
-	FrmSuggestion = .Null.
-	CurrentWord = ""
-	Binding = .F.
+	MaxLine = 130 * 1000				&& Maximum rows to be used from editor
+	MaxSuggestions = 1000				&& Maximum suggestions added to list
+	
+	FrmSuggestion = .Null.				&& Form with the suggestion list
+	FrmTooltip = .Null.					&& Additional information form
+	
+	CurrentWord = ""					&& Current word
+	
+	ShowInfo = .T.						&& Show additional information?
 	
 	AddPublicVariables = .T.
 	AddDefaultCommands = .T.
 	AddDefaultFuctions = .T.
 	AddDefaultBaseClasses = .T.
-	AddDefaultDBCEvents = .T.
+	AddDefaultDBCEvents = .F.			
 	
 	AutoClosingSingleQuotes = .T.
 	AutoClosingDoubleQuotes = .T.
@@ -27,8 +31,12 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 	Procedure Init
 		Lparameters WHandle
 		
+		Use __foxcode In 0 Shared Again
+		Use __foxcodePEM In 0 Shared Again
+		
 		DoDefault(WHandle)
 		This.FrmSuggestion = NewObject("FrmSuggestion", "Popup.prg", "", This)
+		This.FrmTooltip = NewObject("FrmTooltip", "Popup.prg", "", This)
 		This.TextToCursor()
 		
 		Declare Integer GetCaretPos in Win32API String@
@@ -75,7 +83,7 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 	Procedure GetPemSuggestions
 		Lparameters ObjName
 		
-		Local i
+		Local i, PemCode, PemParam, PemTip
 		Local Array Members[1]
 		
 		Select * from crsCache where 1=0 into cursor crsPemCache READWRITE
@@ -85,8 +93,24 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 		EndIf 
 		
 		If Type(ObjName) = "O"
+			
 			For i=1 to AMembers(Members, Evaluate(ObjName), 3)
-				Insert into crsPemCache values (Proper(Members[i, 1]), Members[i, 1], Lower(Substr(Members[i, 2], 1, 3)))
+				
+				PemCode = Members[i, 1]
+				PemParam = ""
+				PemTip = ""
+				If Seek(Padr(Upper(PemCode), 30)+Upper(&ObjName..BaseClass), "__foxcodePEM", "codeclass")
+					PemCode = __foxcodePEM.Code
+					PemParam = __foxcodePEM.Param
+					PemTip = __foxcodePEM.Tip
+				EndIf 	
+			
+				
+				Insert into crsPemCache values (PemCode, ;
+												Upper(PemCode), ;
+												Lower(Substr(Members[i, 2], 1, 3)), ;
+												PemParam, ; 
+												PemTip)
 			Next 
 			
 			Return .T.
@@ -100,10 +124,13 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 	Procedure ShowSuggestions
 	
 		If Reccount("crsFilter") > 0
+			Select crsFilter
+			Index on upword tag upword
 			This.FrmSuggestion.lstItems.Refresh()
 			This.FrmSuggestion.Visible = .T.
 			This.WSelect()
 		Else
+			This.FrmTooltip.Visible = .F.
 			This.FrmSuggestion.Visible = .F.
 		EndIf	
 		
@@ -156,8 +183,28 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 		Local AllText, NewText, Steps, LenStep, RestWord,;
 				CharRight, nAt, i, j , Type 
 				
-		Create Cursor ("crsCache") (Word c(40), UpWord c(40), Type c(3))
-		Index on Upper(Word) tag word				
+		Create Cursor ("crsCache") (Word c(40), UpWord c(40), Type c(3), Param c(100), Tip c(254))
+		Index on Upper(Word) tag word	
+		
+		If This.AddPublicVariables
+			This.GetPublicVariables()
+		EndIf 	 
+		
+		If This.AddDefaultCommands
+			This.GetDefaultCommands()
+		EndIf 
+		
+		If This.AddDefaultFuctions
+			this.GetDefaultFuctions()
+		EndIf 
+				
+		If This.AddDefaultDBCEvents
+			This.GetDefaultDBCEvents()
+		EndIf 
+		
+		If This.AddDefaultBaseClasses
+			This.GetDefaultBaseClasses()
+		EndIf					
 		
 		AllText = This.GetAllText()
 		
@@ -188,101 +235,95 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 							
 				m.Word = Padr(GetWordNum(NewText , j, This.Boundaries), 40)
 				
- 				This.AddWord(m.Word)
+ 				This.AddWord(m.Word, "", "", "")
 			
 			Next  	
 				 
 		Next
-		
-		If This.AddPublicVariables
-			This.GetPublicVariables()
-		EndIf 	 
-		
-		If This.AddDefaultCommands
-			This.GetDefaultCommands()
-		EndIf 
-		
-		If This.AddDefaultFuctions
-			this.GetDefaultFuctions()
-		EndIf 
-				
-		If This.AddDefaultDBCEvents
-			This.GetDefaultDBCEvents()
-		EndIf 
-		
-		If This.AddDefaultBaseClasses
-			This.GetDefaultBaseClasses()
-		EndIf
 				
 	EndProc 
 	
 	Procedure AddWord
-		Lparameters Word
-		Local VarType, Type 
+		Lparameters Word, Type, Param, Tip
+		Local VarType 
 		
 		If IsDigit(m.Word)	
 			Return 
 		EndIf 
+		
+		If Len(Alltrim(m.Word)) < 2 or Right(m.Word, 1) = "?"
+			Return 
+		EndIf 
 	
-		If !Seek(Upper(m.Word), "crsCache", "word")
+		If !Seek(Upper(Padr(m.Word, 40)), "crsCache", "word")
 			
-			VarType = Type(m.Word) 
-			Do Case 
-				Case VarType = "A" 
-					m.Type = "arr"
-				Case VarType = "C" 
-					m.Type = "cha"
-				Case VarType = "D" 
-					m.Type = "dat"
-				Case VarType = "G" 
-					m.Type = "gen"
-				Case VarType = "L" 
-					m.Type = "log"
-				Case VarType = "M" 
-					m.Type = "mem"
-				Case VarType = "N" 
-					m.Type = "num"
-				Case VarType = "O"
-					m.Type = "obj"
-				Case VarType = "Q"
-					m.Type = "bin"
-				Case VarType = "S"
-					m.Type = "scr"
-				Case VarType = "T"
-					m.Type = "dti"
-				Case VarType = "W"
-					m.Type = "blo"
-				Case VarType = "Y"
-					m.Type = "cur"
-				Otherwise 
-					m.Type = ""																																			
-			EndCase 	 
+			If Empty(m.Type)
+				VarType = Type(m.Word) 
+ 	
+				Do Case 
+					Case VarType == "A" 
+						m.Type = "arr"
+					Case VarType == "C" 
+						m.Type = "cha"
+					Case VarType == "D" 
+						m.Type = "dat"
+					Case VarType == "G" 
+						m.Type = "gen"
+					Case VarType == "L" 
+						m.Type = "log"
+					Case VarType == "M" 
+						m.Type = "mem"
+					Case VarType == "N" 
+						m.Type = "num"
+					Case VarType == "O"
+						m.Type = "obj"
+					Case VarType == "Q"
+						m.Type = "bin"
+					Case VarType == "S"
+						m.Type = "scr"
+					Case VarType == "T"
+						m.Type = "dti"
+					Case VarType == "W"
+						m.Type = "blo"
+					Case VarType == "Y"
+						m.Type = "cur"
+					Otherwise 
+						m.Type = ""																																			
+				EndCase 	
+			EndIf 	 
 			
-			Insert into crsCache values (m.Word, Upper(m.Word), m.Type)			
+			Insert into crsCache values (m.Word, Upper(m.Word), m.Type, m.Param, m.Tip)			
 		EndIf	
 	EndProc 
 	
 	procedure GetPublicVariables
 			
 		Local array ArrTmpFile[1]
-		Local i, TmpFileName, OldSafety, IsPublic, Word, StrFile  
+		Local i, TmpFileName, OldSafety, IsPublic, Word, StrFile, NextWord
 			
 		TmpFileName = Sys(2023)+"\VFP_MEMORY_"+Sys(2015)+".TXT"
 		OldSafety = set("Safety")
-		
 		Set Safety off  
 		List Memory to File (TmpFileName) NoConsole
 		Set Safety &OldSafety
 		
-		StrFile = FileToStr(TmpFileName)
-
-		For i=1 to ALines(ArrTmpFile, StrFile)
+		StrFile = FileToStr(TmpFileName) 
+		
+		For i=1 to ALines(ArrTmpFile, StrFile, 4)
 
 			m.Word = GetWordNum(ArrTmpFile[i], 1, " ")
-			IsPublic = GetWordNum(ArrTmpFile[i], 2, " ") = "Pub"
+			
+			NextWord = GetWordNum(ArrTmpFile[i], 2, " ")
+			
+			If Empty(NextWord)
+				i=i+1
+				
+				NextWord = GetWordNum(ArrTmpFile[i], 1, " ")
+			EndIf 
+			IsPublic = NextWord = "Pub"
 			If IsPublic and !Empty(m.Word)
 				
-				This.AddWord(Proper(m.Word))
+				This.AddWord(m.Word, "", "", "")
 				 	
 			EndIf 	
 		Next 
@@ -295,48 +336,51 @@ Define Class Suggestions As EditorModel of "EditorModel.prg"
 	EndProc	
 	
 	Procedure GetDefaultCommands
-		Local ArrCommands[1], i
-		
-		For i=1 to ALanguage(ArrCommands, 1)
-			This.AddWord(ArrCommands[i])
-		Next
+
+		Select __foxcode
+		Scan for Type = "C"	
+			This.AddWord(Code, "cmd", Param, Tip)
+		EndScan  
+			
 	EndProc 
 	
 	Procedure GetDefaultFuctions
-		Local ArrFunctions[1], i
-		
-		For i=1 to ALanguage(ArrFunctions, 2)
-			This.AddWord(ArrFunctions[i, 1])
-		Next	
+
+		Select __foxcode
+		Scan for Type = "F"	
+			This.AddWord(Code, "fun", Param, Tip)
+		EndScan  
+			
 	EndProc 
 	
 	Procedure GetDefaultBaseClasses
-		Local ArrBaseClasses[1], i
-		
-		For i=1 to ALanguage(ArrBaseClasses, 3)
-			This.AddWord(ArrBaseClasses[i])
-		Next	
+	
+		Select __foxcode
+		Scan for Type = "T"	
+			This.AddWord(Code, "tip", Param, Tip)
+		EndScan
+			
 	EndProc 
 	
 	Procedure GetDefaultDBCEvents
 		Local ArrDBCEvents[1], i
 		
 		For i=1 to ALanguage(ArrDBCEvents, 4)
-			This.AddWord(ArrDBCEvents[i])
+			This.AddWord(ArrDBCEvents[i], "dbc", "", "")
 		Next	
 	EndProc 
 	
 	Procedure AddCurretWord
 		Lparameters Key
 		Local CurrentWord
-		
+
 		CurrentWord = This.GetCurrentWord(Key)
 		
 		If Empty(CurrentWord)
 			Return 
 		EndIf 
 		
-		This.AddWord(CurrentWord)
+		This.AddWord(CurrentWord, "", "", "")
 	EndProc 
 	
 	Procedure Destroy
