@@ -6,7 +6,7 @@ VFP IntelliSense offers public memory variable suggestions and simple word-based
 ### Quick info
 ![Suggestions](https://github.com/JanderSousa/vfp-intellisense/blob/master/demo/info.gif)
 
-### Instalação
+### Installing
 ```
 git clone https://github.com/JanderSousa/vfp-intellisense.git
 
