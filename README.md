@@ -3,7 +3,8 @@ VFP IntelliSense offers public memory variable suggestions and simple word-based
 
 ![Suggestions](https://github.com/JanderSousa/vfp-intellisense/blob/master/demo/Suggestions.gif)
 
-### Quick info
+Quick info
+
 ![Suggestions](https://github.com/JanderSousa/vfp-intellisense/blob/master/demo/info.gif)
 
 ### Installing
