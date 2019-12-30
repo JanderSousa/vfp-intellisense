@@ -10,12 +10,13 @@ Quick info
 ### Installing
 ```
 git clone https://github.com/JanderSousa/vfp-intellisense.git
+```
 
 In VFP
+```
 cd vfp-intellisense
 do InstallIntellisense.prg
 ```
-
 
 ### Inspiration
 * [FoxcodePlus](https://github.com/VFPX/FoxcodePlus)
