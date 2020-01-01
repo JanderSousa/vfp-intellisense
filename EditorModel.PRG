@@ -169,7 +169,7 @@ Define Class EditorModel As Session
 		StartPos = This.GetLineStart(Lineno)
 		EndPos = This.GetLineStart(Lineno+1)-1
 
-		If StartPos = EndPos
+		If StartPos < 0 or EndPos < 0 or StartPos = EndPos
 			Return ""
 		Endif
 
