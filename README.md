@@ -12,7 +12,7 @@ Quick info
 git clone https://github.com/JanderSousa/vfp-intellisense.git
 ```
 
-In VFP
+On VFP
 ```
 cd vfp-intellisense
 do InstallIntellisense.prg
