@@ -34,11 +34,11 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	AutoClosingBrackets = .T.
 	AutoClosingParentheses = .T.
 
-	EncloseSelectedTextInSingleQuotes = .T.
-	EncloseSelectedTextInDoubleQuotes = .T.
-	EncloseSelectedTextInBraces = .T.
-	EncloseSelectedTextInBrackets = .T.
-	EncloseSelectedTextInParentheses = .T.
+	AutoSurroundSingleQuotes = .T.
+	AutoSurroundDoubleQuotes = .T.
+	AutoSurroundBraces = .T.
+	AutoSurroundBrackets = .T.
+	AutoSurroundParentheses = .T.
 
 	Procedure Init(nWinHandle)
 
@@ -561,15 +561,15 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Endif
 
 		Do Case
-			Case nKey = 39 And This.EncloseSelectedTextInSingleQuotes
+			Case nKey = 39 And This.AutoSurroundSingleQuotes
 				cTextInsert = "'"
-			Case nKey = 34 And This.EncloseSelectedTextInDoubleQuotes
+			Case nKey = 34 And This.AutoSurroundDoubleQuotes
 				cTextInsert = '"'
-			Case nKey = 123 And This.EncloseSelectedTextInBraces
+			Case nKey = 123 And This.AutoSurroundBraces
 				cTextInsert = "}"
-			Case nKey = 91 And This.EncloseSelectedTextInBrackets
+			Case nKey = 91 And This.AutoSurroundBrackets
 				cTextInsert = "]"
-			Case nKey = 40 And This.EncloseSelectedTextInParentheses
+			Case nKey = 40 And This.AutoSurroundParentheses
 				cTextInsert = ")"
 		Endcase
 
