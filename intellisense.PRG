@@ -140,11 +140,6 @@ Define Class Intellisense As Editor Of "Editor.prg"
 				ArrItems[nArrItemsCount, 3] = Lower(Substr(ArrMembers[i, 2], 1, 3))
 				ArrItems[nArrItemsCount, 4] = Alltrim(cPemParam)
 				ArrItems[nArrItemsCount, 5] = Alltrim(cPemTip)
-				
-				
-*!*					ArrItems[nArrItemsCount, 1] = cPemCode
-*!*					ArrItems[nArrItemsCount, 2] = Newobject("IntellisenseItem", "Intellisense.PRG", "", cPemCode, ;
-*!*						Lower(Substr(ArrMembers[i, 2], 1, 3)), cPemParam, cPemTip)
 
 			Next
 
@@ -406,9 +401,6 @@ Define Class Intellisense As Editor Of "Editor.prg"
 			This.ArrItems[This.ArrItemsCount, 3] = cType
 			This.ArrItems[This.ArrItemsCount, 4] = Alltrim(cParam)
 			This.ArrItems[This.ArrItemsCount, 5] = Alltrim(cTip)
-			
-*!*				This.ArrItems[This.ArrItemsCount, 1] = Lower(cWord)
-*!*				This.ArrItems[This.ArrItemsCount, 2] = Createobject("IntellisenseItem", cWord, cType, cParam, cTip)
 
 		Endif
 	Endproc
