@@ -31,9 +31,7 @@ Define Class FrmSuggestion As Form
 	Procedure lstitems.Refresh
 		Local nIems, i, nLeft, nTop
 		
-		*Thisform.LockScreen = .T.
-		*Thisform.Visible = .F.
-		
+		Local oIntellisense
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(Thisform.WinHandle)
 		
 		If IsNull(oIntellisense)
@@ -111,17 +109,10 @@ Define Class FrmSuggestion As Form
 			Thisform.Left = nLeft + 1
 		EndIf
 		
-		If oIntellisense.FrmToolTip.Visible	
-			oIntellisense.FrmToolTip.ShowDetail(oIntellisense.ArrCurrentItems[1, 4], oIntellisense.ArrCurrentItems[1, 5])	
-		EndIf 
-		
 		If nItems > 0
 			This.Selected[1] = .T.
 		Endif		
-		
-		*Thisform.Visible = .T.
-		*Thisform.LockScreen = .F.
-		
+
 	Endproc
 
 	Procedure Init
@@ -183,7 +174,7 @@ Define Class FrmSuggestion As Form
 	EndProc
 	 
 	Procedure lstitems.ProgrammaticChange
-		Local i, cSelectedWord , nIndex
+		Local i, cSelectedWord , nIndex, oIntellisense
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(Thisform.WinHandle)
 
 		If IsNull(oIntellisense)
@@ -211,7 +202,7 @@ Define Class FrmSuggestion As Form
 
 	Procedure lstitems.Click
 
-		Local nStartPos, i, cSelectedWord, nIndex
+		Local nStartPos, i, cSelectedWord, nIndex, oIntellisense
 		
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(Thisform.WinHandle)
 		
@@ -250,7 +241,6 @@ Define Class FrmSuggestion As Form
 		oIntellisense.FrmTooltip.Visible = .F.
 		Thisform.Visible = .F.
 
-		*nPosition = oIntellisense.GetFileCursorPos(oIntellisense.WHandle)
 		nPosition = oIntellisense.GetFileCursorPos(oIntellisense.WHandle) + oIntellisense.IncrementRight
 		
 		nStartPos = nPosition - Len(oIntellisense.CurrentWord)
@@ -264,7 +254,8 @@ Define Class FrmSuggestion As Form
 
 	Procedure lstitems.KeyPress
 		Lparameters nKeyCode, nShiftAltCtrl
-
+		
+		Local oIntellisense
 		Thisform.NoSuggest = .F.
 
 		If Inlist(nKeyCode, 5, 24)
@@ -277,7 +268,6 @@ Define Class FrmSuggestion As Form
 		If IsNull(oIntellisense)
 			Return 
 		EndIf		
-
 
 		If Inlist(nKeyCode, 27, 4, 19)
 			NoDefault
@@ -299,7 +289,6 @@ Define Class FrmSuggestion As Form
 				lQualifier = Between(nKeyCode,Asc("A"),Asc("Z")) Or ;
 					nKeyCode == Asc("_")
 		Endcase
-
 
 		If lQualifier
 			oIntellisense.WSelect(oIntellisense.WHandle)
@@ -400,6 +389,7 @@ Define Class FrmTooltip As Form
 	Procedure ShowDetail
 		Lparameters cParam, cTip		
 		
+		Local oIntellisense
 		Thisform.LockScreen = .T.
 		
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(This.WinHandle)
