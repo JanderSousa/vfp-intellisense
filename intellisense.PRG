@@ -57,8 +57,8 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		This.LineHeight = Fontmetric(1, This.FontName, This.FontSize)
 		This.AvgCharWidth = Fontmetric(6, This.FontName, This.FontSize)
 
-		This.FrmSuggestion = Newobject("FrmSuggestion", "Forms.PRG", "", This)
-		This.FrmTooltip = Newobject("FrmTooltip", "Forms.PRG", "", This)
+		This.FrmSuggestion = Newobject("FrmSuggestion", "Forms.PRG", "", This.HWnd)
+		This.FrmTooltip = Newobject("FrmTooltip", "Forms.PRG", "", This.HWnd)
 		
 		This.TextToMemory()
 
@@ -505,8 +505,9 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	Endproc
 
 	Procedure Destroy
-
+		
 		This.FrmSuggestion = .Null.
+		This.FrmTooltip = .Null.
 
 	Endproc
 
