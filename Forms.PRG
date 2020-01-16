@@ -199,6 +199,11 @@ Define Class FrmSuggestion As Form
 		EndIf
 			
 	EndProc 
+	
+	Procedure lstitems.MouseWheel
+		LPARAMETERS nDirection, nShift, nXCoord, nYCoord
+		This.SetFocus()
+	EndProc 
 
 	Procedure lstitems.Click
 

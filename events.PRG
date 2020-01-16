@@ -1,15 +1,16 @@
 Define Class Events As Custom
 
-	#Define WM_ACTIVATE    0x0006
-	#Define WM_KILLFOCUS   0x0008
-	#Define WM_SETFOCUS    0x0007
-	#Define WM_CLOSE       0x0010
-	#Define WM_KEYUP       0x0101
-	#Define WM_KEYDOWN     0x0100
-	#Define WM_LBUTTONDOWN 0x0201
-	#Define WM_MBUTTONDOWN 0x0207
-	#Define WM_RBUTTONDOWN 0x0204
-	#Define WM_DESTROY     0x0002
+	#Define WM_ACTIVATE    	0x0006
+	#Define WM_KILLFOCUS   	0x0008
+	#Define WM_SETFOCUS    	0x0007
+	#Define WM_CLOSE       	0x0010
+	#Define WM_KEYUP       	0x0101
+	#Define WM_KEYDOWN     	0x0100
+	#Define WM_LBUTTONDOWN 	0x0201
+	#Define WM_MBUTTONDOWN 	0x0207
+	#Define WM_RBUTTONDOWN 	0x0204
+	#define WM_MOUSEWHEEL	0x020A
+	#Define WM_DESTROY     	0x0002
 
 	#Define GWL_WNDPROC    -4
 
@@ -84,7 +85,7 @@ Define Class Events As Custom
 			Case Msg = WM_KEYDOWN
 				cCallW = This.GetKeyDown(HWnd, Msg, wParam, Lparam)
 
-			Case Inlist(Msg, WM_LBUTTONDOWN, WM_MBUTTONDOWN, WM_RBUTTONDOWN)
+			Case Inlist(Msg, WM_LBUTTONDOWN, WM_MBUTTONDOWN, WM_RBUTTONDOWN, WM_MOUSEWHEEL)
 				cCallW = This.FrmHideMismatch(HWnd)
 
 			Otherwise
@@ -166,6 +167,7 @@ Define Class Events As Custom
 			Bindevent(0, WM_LBUTTONDOWN, This, "EventHandler")
 			Bindevent(0, WM_MBUTTONDOWN, This, "EventHandler")
 			Bindevent(0, WM_RBUTTONDOWN, This, "EventHandler")
+			Bindevent(0, WM_MOUSEWHEEL, This, "EventHandler")
 		Endif
 
 	Endproc
