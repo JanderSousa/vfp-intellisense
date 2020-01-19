@@ -26,7 +26,8 @@ Define Class IntellisenseCollection As Collection
 
 		* Already started
 		If nIndex > 0
-			Return This.Item(nIndex)
+			oIntellisense = This.Item(nIndex)
+			Return oIntellisense
 		Endif
 
 		oWinEnvironment = This.Editor.GetWindowEnvironment(nWinHandle)
@@ -44,7 +45,7 @@ Define Class IntellisenseCollection As Collection
 			Return oIntellisense
 		Endif
 
-		Return .Null. 
+		Return .Null.
 
 	EndProc
 	

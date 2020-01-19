@@ -8,6 +8,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	FontSize = 10
 	LineHeight = 0
 	AvgCharWidth = 0
+	AllText = ""
 
 	Dimension ArrCurrentItems[1, 5]
 	Dimension ArrItems[1, 5]
@@ -110,7 +111,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Local i, cPemCode, cPemParam, cPemTip, ArrItems[1, 2], nArrItemsCount, ArrToShow[1, 2]
 		Local Array ArrMembers[1]
 
-		If Lower(cObjName) == "this"
+		If InList(Lower(cObjName), "this", "_vfp")
 			Return .F.
 		Endif
 
@@ -189,7 +190,6 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Endif
 
 		If nKey = 32 And lControl
-			This.TextToMemory()
 			This.SearchWord(.F., .T.)
 		Else
 			This.SearchWord()
@@ -294,53 +294,33 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		
 		cAllText = This.GetAllText(This.WHandle)
 		
-		Return This.AddSimpleWords(cAllText)
+		Return This.AddSimpleWordsAsync(cAllText)
 	
-	EndProc 
+	EndProc
 	
-	Procedure AddSimpleWords(cAllText)
-	
-		Local cAllText, cNewText, nSteps, nLenStep, cRestWord,;
-			cCharRight, nAt, i, j
-			   
-		nLenStep = 250
-		nSteps = Max(Ceiling(Len(cAllText) / nLenStep), nLenStep)
+	Procedure AddSimpleWordsAsync(cAllText)
+		
+		Declare Long CreateThreadWithObject In DMult.DLL ;
+			String pszClass, ;
+			String pszMethod, ;
+			Object oRef, ;
+			Long @pdwThreadId
+			
+		Declare CloseHandle In Win32API Long
+		 
+		Local nHandle, nThreadID, oCallback 
+		nThreadID = 0	
 
-		cRestWord = ""
-
-		For i = 1 To nSteps
-
-			cNewText = cRestWord + Substr(cAllText, (nLenStep * (i-1))+1, nLenStep)
-			cRestWord = ""
-
-			If Empty(cNewText)
-				Exit
-			Endif
-
-			If i != nSteps
-				Do While !Empty(cNewText)
-					cCharRight = Right(cNewText, 1)
-					If cCharRight $ This.Boundaries
-						Exit
-					Endif
-
-					cRestWord = cCharRight + cRestWord
-					nAt = At(cCharRight, cNewText, Max(Occurs(cCharRight, cNewText), 1))-1
-					cNewText = Substr(cNewText, 1, nAt)
-				Enddo
-			Endif
-
-			For j=1 To Getwordcount(cNewText , This.Boundaries)
-
-				cWord = Padr(Getwordnum(cNewText , j, This.Boundaries), 40)
-
-				This.AddWord(cWord, "", "", "")
-
-			Next
-
-		Next
-
-	Endproc
+		This.AllText = cAllText
+		oCallback = This
+		nHandle = CreateThreadWithObject( ;
+						Strconv("sample.EasyMTServer"+Chr(0), 5), ;
+						Strconv("SomeLengthyProcess"+Chr(0), 5), ;
+						_VFP.Eval("oCallback"), ;
+						@nThreadID)	
+		
+		=CloseHandle(nHandle)				
+	EndFunc	 
 
 	Procedure AddWord(cWord, cType, cParam, cTip)
 
@@ -640,4 +620,4 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Return Child
 	Endproc
 
-Enddefine
+EndDefine
