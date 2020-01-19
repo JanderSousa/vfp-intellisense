@@ -162,7 +162,7 @@ Define Class FrmSuggestion As Form
 		This.BackColor = This.lstitems.ItemBackColor
 	Endproc
 
-	Procedure LostFocus
+	Procedure LostFocus 
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(Thisform.WinHandle)
 		
 		If IsNull(oIntellisense)
