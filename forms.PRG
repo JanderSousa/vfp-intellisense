@@ -3,13 +3,12 @@ Define Class FrmSuggestion As Form
 	BorderStyle = 0
 	Height = 250
 	Width = 400
-	DoCreate = .T.
-	AutoCenter = .T.
-	Caption = "Form1"
+	Caption = "Suggestions"
 	TitleBar = 0
 	AlwaysOnTop = .T.
+	ShowWindow = 1
 	AllowOutput = .F.
-	Name = "Form1"
+	Name = "Suggestions"
 	NoSuggest = .F.
 	MaxVisibleSuggestions = 10
 	WinHandle = 0
@@ -193,7 +192,6 @@ Define Class FrmSuggestion As Form
 			If Empty(oIntellisense.ArrCurrentItems[nIndex, 5])
 				oIntellisense.FrmTooltip.Visible = .F.
 			Else
-				oIntellisense.FrmTooltip.CntLabels.Refresh()
 				oIntellisense.FrmTooltip.ShowDetail(oIntellisense.ArrCurrentItems[nIndex, 4], oIntellisense.ArrCurrentItems[nIndex, 5])
 			Endif
 		EndIf
@@ -336,14 +334,13 @@ Define Class FrmTooltip As Form
 	BorderStyle = 0
 	Height = 250
 	Width = 400
-	DoCreate = .T.
-	AutoCenter = .T.
-	Caption = "Form1"
+	Caption = "Tooltip"
 	Enabled = .F.
 	TitleBar = 0
 	AlwaysOnTop = .T.
+	ShowWindow = 1
 	AllowOutput = .F.
-	Name = "Form1"
+	Name = "Tooltip"
 
 
 	Add Object CntLabels As Container With ;
@@ -395,7 +392,6 @@ Define Class FrmTooltip As Form
 		Lparameters cParam, cTip		
 		
 		Local oIntellisense
-		Thisform.LockScreen = .T.
 		
 		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(This.WinHandle)
 		
@@ -435,10 +431,10 @@ Define Class FrmTooltip As Form
 	  		Thisform.Top = oIntellisense.FrmSuggestion.Top
 	      
 	    EndWith  
-			
-		Thisform.LockScreen = .F.	
 		
-		Thisform.Visible = .T.	
+		If !Thisform.Visible
+			Thisform.Visible = .T.	
+		EndIf 	
 		
 	EndProc 
 	

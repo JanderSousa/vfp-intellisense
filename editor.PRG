@@ -68,10 +68,7 @@ Define Class Editor As Custom
 				cTextLine = cLeftText
 			Else
 				cTextLine = cLeftText + GetWordNum(cRightText, 1, " ")
-				
-				* test
 				This.IncrementRight = Len(GetWordNum(cRightText, 1, " "))
-				
 			EndIf 
 		EndIf 
 		

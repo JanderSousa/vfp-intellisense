@@ -189,7 +189,7 @@ Define Class Events As Custom
 	Procedure FrmHideMismatch
 		Lparameters HWnd
 
-		Local i, oIntellisense, oFrmSuggestion, oFrmTooltip
+		Local i, oIntellisense, oFrmSuggestion, oFrmTooltip, lVisible 
 		For i=1 To This.IntellisenseCollection.Count
 			oIntellisense = This.IntellisenseCollection.Item[i]
 
@@ -198,9 +198,18 @@ Define Class Events As Custom
 
 			If Vartype(oFrmSuggestion) != "O"
 				Loop
-			Endif
+			EndIf
+			
+			lVisible = oFrmSuggestion.HWnd = HWnd
+			
+			If !oFrmSuggestion.Visible and lVisible
+				oFrmSuggestion.Visible = lVisible				 	
+			EndIf 
+			
+			If !lVisible
+				oFrmSuggestion.Visible = .F.
+			EndIf 
 
-			oFrmSuggestion.Visible = oFrmSuggestion.HWnd = HWnd
 			If oFrmTooltip.Visible
 				oFrmTooltip.Visible = oFrmSuggestion.Visible
 			Endif

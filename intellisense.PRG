@@ -161,10 +161,10 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		This.FrmTooltip.LockScreen = .T.
 
 		If !Empty(This.ArrCurrentItems)
-
 			This.FrmSuggestion.Refresh()
-			This.FrmSuggestion.Visible = .T.
-
+			If !This.FrmSuggestion.Visible
+				This.FrmSuggestion.Visible = .T.
+			EndIf 
 		Else
 			This.FrmTooltip.Visible = .F.
 			This.FrmSuggestion.Visible = .F.
@@ -292,7 +292,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 			This.GetDefaultBaseClasses()
 		Endif
 		
-		cAllText = THis.GetAllText(THis.WHandle)
+		cAllText = This.GetAllText(This.WHandle)
 		
 		Return This.AddSimpleWordsAsync(cAllText)
 	
