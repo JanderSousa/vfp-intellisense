@@ -336,7 +336,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 
 		cWord = Alltrim(cWord)
 
-		If Ascan(This.ArrItems, cWord, 1, -1, 1, 1) = 0
+		If Ascan(This.ArrItems, cWord, 1, -1, 1, 15) = 0
 
 			If Empty(cType)
 				cVarType = Type(cWord)
