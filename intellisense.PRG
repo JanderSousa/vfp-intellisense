@@ -292,7 +292,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 			This.GetDefaultBaseClasses()
 		Endif
 		
-		cAllText = This.GetAllText(This.WHandle)
+		cAllText = THis.GetAllText(THis.WHandle)
 		
 		Return This.AddSimpleWordsAsync(cAllText)
 	
@@ -312,10 +312,10 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		nThreadID = 0	
 
 		This.AllText = cAllText
-		oCallback = This
+		oCallback = CreateObject("AddSimpleWordsAsync", cAllText, This.HWnd)
 		nHandle = CreateThreadWithObject( ;
-						Strconv("sample.EasyMTServer"+Chr(0), 5), ;
-						Strconv("SomeLengthyProcess"+Chr(0), 5), ;
+						Strconv("LoadTextAsync.LoadTextAsync"+Chr(0), 5), ;
+						Strconv("TextToMemoryAsync"+Chr(0), 5), ;
 						_VFP.Eval("oCallback"), ;
 						@nThreadID)	
 		
@@ -621,3 +621,30 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	Endproc
 
 EndDefine
+
+Define Class AddSimpleWordsAsync As Custom
+	
+	AllText = ""
+	WinHandle = 0
+	
+	Procedure Init(cAllText, HWnd)
+		This.AllText = cAllText
+		This.WinHandle = HWnd
+	EndProc 
+	
+	Procedure AddWord(cWord)
+		Local oIntellisense
+		oIntellisense = _Screen.IntellisenseEvents.IntellisenseCollection.GetIntellisense(This.WinHandle)
+		
+		If IsNull(oIntellisense)
+			This.Release()
+			Return 
+		EndIf 
+		oIntellisense.AddWord(cWord, "", "", "")
+	EndProc 
+	
+	Procedure Release
+		Release This
+	EndProc	
+	
+EndDefine 

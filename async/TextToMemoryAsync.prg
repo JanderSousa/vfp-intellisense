@@ -38,7 +38,7 @@ Define class LoadTextAsync As Session olepublic
 
 			For j=1 To Getwordcount(cNewText , This.Boundaries)
 				cWord = Padr(Getwordnum(cNewText , j, This.Boundaries), 40)
-				oCallback.AddWord(cWord, "", "", "")
+				oCallback.AddWord(cWord)
 			Next
 
 		Next
