@@ -432,7 +432,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 
 	Procedure Getkeywords
 	
-		If !Used("__keywords.dbf")
+		If !Used("__keywords")
 			Use __keywords In 0 Shared Again
 		Endif
 
