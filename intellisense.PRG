@@ -24,10 +24,12 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	ShowInfo = .T.					&& Show additional information?
 
 	AddPublicVariables = .T.
+	Addkeywords = .T.
 	AddDefaultCommands = .T.
 	AddDefaultFuctions = .T.
 	AddDefaultBaseClasses = .T.
 	AddDefaultDBCEvents = .F.
+	
 
 	AutoClosingSingleQuotes = .T.
 	AutoClosingDoubleQuotes = .T.
@@ -271,7 +273,11 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		This.ArrItemsCount = 0
 		Dimension This.ArrItems[1, 1]
 		This.ArrItems[1, 1] = ""
-
+		
+		If This.Addkeywords
+			This.Getkeywords()
+		EndIf 
+		
 		If This.AddPublicVariables
 			This.GetPublicVariables()
 		Endif
@@ -384,7 +390,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 
 		Endif
 	Endproc
-
+	
 	Procedure GetPublicVariables
 
 		Local Array ArrTmpFile[1]
@@ -423,6 +429,19 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Endtry
 
 	Endproc
+
+	Procedure Getkeywords
+	
+		If !Used("__keywords.dbf")
+			Use __keywords In 0 Shared Again
+		Endif
+
+		Select __keywords
+		Scan
+			This.AddWord(keyword, "key", "", "")
+		Endscan	
+	
+	EndProc 
 
 	Procedure GetDefaultCommands
 
