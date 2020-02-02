@@ -118,7 +118,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 		Endif
 
 		If Type(cObjName) = "O"
-
+			
 			If !Used("__foxcodePEM")
 				Use __foxcodePEM In 0 Shared Again
 			Endif
@@ -130,7 +130,8 @@ Define Class Intellisense As Editor Of "Editor.prg"
 				cPemCode = Lower(ArrMembers[i, 1])
 				cPemParam = ""
 				cPemTip = ""
-				If Seek(Padr(Upper(cPemCode), 30)+Upper(&cObjName..BaseClass), "__foxcodePEM", "codeclass")
+
+				If PemStatus(&cObjName, "BaseClass", 5) and Seek(Padr(Upper(cPemCode), 30)+Upper(&cObjName..BaseClass), "__foxcodePEM", "codeclass")
 					cPemCode = __foxcodePEM.Code
 					cPemParam = __foxcodePEM.Param
 					cPemTip = __foxcodePEM.Tip
