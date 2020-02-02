@@ -259,6 +259,11 @@ Define Class Events As Custom
 			This.KEY_SHIFT = Bittest(___GetKeyState(.Shift), 7)
 			
 			If !This.KEY_CONTROL And wParam = .Space
+				oIntellisense = This.IntellisenseCollection.TryToStart()
+				If !Isnull(oIntellisense)
+					oIntellisense.AddCurretWord(.Space)
+				EndIf
+				
 				Return This.HideSuggestVisible()
 			EndIf 
 			
