@@ -36,6 +36,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	AutoClosingBraces = .T.
 	AutoClosingBrackets = .T.
 	AutoClosingParentheses = .T.
+	AutoClosingTags = .T.
 
 	AutoSurroundSingleQuotes = .T.
 	AutoSurroundDoubleQuotes = .T.
@@ -514,7 +515,7 @@ Define Class Intellisense As Editor Of "Editor.prg"
 	Procedure AutoClosing(nKey)
 
 		Local cTextInsert
-		If !Inlist(nKey, 39, 34, 123, 91, 40)
+		If !Inlist(nKey, 39, 34, 123, 91, 40, 62)
 			Return .F.
 		Endif
 
@@ -529,6 +530,11 @@ Define Class Intellisense As Editor Of "Editor.prg"
 				cTextInsert = "]"
 			Case nKey = 40 And This.AutoClosingParentheses
 				cTextInsert = ")"
+			Case nKey = 62 And This.AutoClosingTags
+				cTag = This.GetTag()
+				If !Empty(cTag)
+					cTextInsert = "</"+cTag+">"
+				EndIf
 		Endcase
 
 		If !Empty(cTextInsert)
@@ -536,9 +542,45 @@ Define Class Intellisense As Editor Of "Editor.prg"
 			This.InsertText(This.WHandle, cTextInsert)
 			This.SetFileCursorPos(This.WHandle, nPosition)
 			Return .T.
-		Endif
+		EndIf
+		
+		Return .F.
 
-	Endproc
+	EndProc
+	
+	Procedure GetTag
+		
+		Local cCurrentTextLine, nCurrentCol, nOccurs, nAt, cInfo, i, lContains
+		cCurrentTextLine = This.GetTextCurrentLine(This.WHandle)
+		
+		nCurrentCol = This.GetCurrentCol(This.WHandle)
+
+		If nCurrentCol != Len(cCurrentTextLine)
+			Return ""
+		EndIf
+		
+		nOccurs = Occurs("<", cCurrentTextLine)
+		If nOccurs = 0
+			Return ""
+		EndIf
+		
+		nAt = At("<", cCurrentTextLine, nOccurs)
+		cInfo = Substr(cCurrentTextLine, nAt+1, nCurrentCol - (nAt+1))
+		For i=1 to Len(This.Boundaries)
+			lContains = Substr(This.Boundaries,  i, 1) $ cInfo
+			
+			If lContains
+				Exit 
+			EndIf
+		Next 
+		
+		If !lContains
+			Return cInfo
+		EndIf	
+			
+		Return ""
+		
+	EndProc
 
 	Procedure EncloseIn(nKey)
 

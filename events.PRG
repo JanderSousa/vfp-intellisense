@@ -391,10 +391,13 @@ Define Class Events As Custom
 					If (!This.KEY_CONTROL And Chr(nLastKey) $ This.Boundaries)
 						oIntellisense.AddCurretWord(nLastKey)
 						This.HideSuggestVisible()
-
-						If nLastKey = 46
-							Return oIntellisense.ShowPemSuggestions()
-						Endif
+						
+						Do Case 
+							Case nLastKey = 62
+								Return oIntellisense.AutoClosing(nLastKey)
+							Case nLastKey = 46
+								Return oIntellisense.ShowPemSuggestions()
+						EndCase 
 					Else
 						If oIntellisense.ShowPemSuggestions()
 							Return .T.
